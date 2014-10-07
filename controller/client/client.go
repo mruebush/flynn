@@ -153,6 +153,13 @@ func (c *Client) CreateApp(app *ct.App) error {
 	return c.Post("/apps", app, app)
 }
 
+func (c *Client) UpdateApp(app *ct.App) error {
+	if app.ID == "" {
+		return errors.New("controller: missing id")
+	}
+	return c.Post(fmt.Sprintf("/apps/%s", app.ID), app, app)
+}
+
 // DeleteApp deletes an app.
 func (c *Client) DeleteApp(appID string) error {
 	return c.Delete(fmt.Sprintf("/apps/%s", appID))
@@ -161,6 +168,11 @@ func (c *Client) DeleteApp(appID string) error {
 // CreateProvider cretes a new provider.
 func (c *Client) CreateProvider(provider *ct.Provider) error {
 	return c.Post("/providers", provider, provider)
+}
+
+func (c *Client) GetProvider(providerID string) (*ct.Provider, error) {
+	provider := &ct.Provider{}
+	return provider, c.Get(fmt.Sprintf("/providers/%s", providerID), provider)
 }
 
 // ProvisionResource uses a provider to provision a new resource for the
@@ -172,6 +184,22 @@ func (c *Client) ProvisionResource(req *ct.ResourceReq) (*ct.Resource, error) {
 	res := &ct.Resource{}
 	err := c.Post(fmt.Sprintf("/providers/%s/resources", req.ProviderID), req, res)
 	return res, err
+}
+
+func (c *Client) GetResource(providerID, resourceID string) (*ct.Resource, error) {
+	res := &ct.Resource{}
+	err := c.Get(fmt.Sprintf("/providers/%s/resources/%s", providerID, resourceID), res)
+	return res, err
+}
+
+func (c *Client) ResourceList(providerID string) ([]*ct.Resource, error) {
+	var resources []*ct.Resource
+	return resources, c.Get(fmt.Sprintf("/providers/%s/resources", providerID), &resources)
+}
+
+func (c *Client) AppResourceList(appID string) ([]*ct.Resource, error) {
+	var resources []*ct.Resource
+	return resources, c.Get(fmt.Sprintf("/apps/%s/resources", appID), &resources)
 }
 
 // PutResource updates a resource.
@@ -241,6 +269,15 @@ func (c *Client) DeleteRoute(appID string, routeID string) error {
 func (c *Client) GetFormation(appID, releaseID string) (*ct.Formation, error) {
 	formation := &ct.Formation{}
 	return formation, c.Get(fmt.Sprintf("/apps/%s/formations/%s", appID, releaseID), formation)
+}
+
+func (c *Client) FormationList(appID string) ([]*ct.Formation, error) {
+	var formations []*ct.Formation
+	return formations, c.Get(fmt.Sprintf("/apps/%s/formations", appID), &formations)
+}
+
+func (c *Client) DeleteFormation(appID, releaseID string) error {
+	return c.Delete(fmt.Sprintf("/apps/%s/formations/%s", appID, releaseID))
 }
 
 // GetRelease returns details for the specified release.
@@ -358,10 +395,25 @@ func (c *Client) KeyList() ([]*ct.Key, error) {
 	return keys, c.Get("/keys", &keys)
 }
 
+func (c *Client) ArtifactList() ([]*ct.Artifact, error) {
+	var artifacts []*ct.Artifact
+	return artifacts, c.Get("/artifacts", &artifacts)
+}
+
+func (c *Client) ReleaseList() ([]*ct.Release, error) {
+	var releases []*ct.Release
+	return releases, c.Get("/releases", &releases)
+}
+
 // CreateKey uploads pubKey as the ssh public key.
 func (c *Client) CreateKey(pubKey string) (*ct.Key, error) {
 	key := &ct.Key{}
 	return key, c.Post("/keys", &ct.Key{Key: pubKey}, key)
+}
+
+func (c *Client) GetKey(keyID string) (*ct.Key, error) {
+	key := &ct.Key{}
+	return key, c.Get(fmt.Sprintf("/keys/%s", keyID), key)
 }
 
 // DeleteKey deletes a key with the specified id.
