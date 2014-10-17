@@ -39,6 +39,24 @@ layout: docs
 
 {app_delete controller_example}
 
+# Routes
+
+## Create
+
+{route_create controller_example}
+
+## Get
+
+{route_get controller_example}
+
+## List
+
+{route_list controller_example}
+
+## Delete
+
+{route_delete controller_example}
+
 # Artifacts
 
 ## Create
