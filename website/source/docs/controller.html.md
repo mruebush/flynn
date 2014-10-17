@@ -39,6 +39,12 @@ layout: docs
 
 {app_delete controller_example}
 
+## Resources
+
+### List
+
+{app_resource_list controller_example}
+
 # Routes
 
 ## Create
