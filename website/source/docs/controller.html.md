@@ -45,6 +45,16 @@ layout: docs
 
 {app_resource_list controller_example}
 
+## Release
+
+### Set
+
+{app_release_set controller_example}
+
+### Get
+
+{app_release_get controller_example}
+
 # Routes
 
 ## Create
