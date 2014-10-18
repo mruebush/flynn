@@ -55,6 +55,24 @@ layout: docs
 
 {app_release_get controller_example}
 
+## Formation
+
+### Create
+
+{formation_put controller_example}
+
+### Get
+
+{formation_get controller_example}
+
+### List
+
+{formation_list controller_example}
+
+### Delete
+
+{formation_delete controller_example}
+
 # Routes
 
 ## Create
