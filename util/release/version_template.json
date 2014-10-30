@@ -1,14 +1,14 @@
 {
-  "flynn/etcd": "$image_id[etcd]",
-  "flynn/discoverd": "$image_id[discoverd]",
-  "flynn/host": "$image_id[host]",
-  "flynn/postgresql": "$image_id[postgresql]",
-  "flynn/controller": "$image_id[controller]",
-  "flynn/blobstore": "$image_id[blobstore]",
-  "flynn/router": "$image_id[router]",
-  "flynn/receiver": "$image_id[receiver]",
-  "flynn/slugbuilder": "$image_id[slugbuilder]",
-  "flynn/slugrunner": "$image_id[slugrunner]",
-  "flynn/bootstrap": "$image_id[bootstrap]",
-  "flynn/taffy": "$image_id[taffy]"
+  "https://$docker_registry/$docker_user/etcd": "$image_id[etcd]",
+  "https://$docker_registry/$docker_user/discoverd": "$image_id[discoverd]",
+  "https://$docker_registry/$docker_user/host": "$image_id[host]",
+  "https://$docker_registry/$docker_user/postgresql": "$image_id[postgresql]",
+  "https://$docker_registry/$docker_user/controller": "$image_id[controller]",
+  "https://$docker_registry/$docker_user/blobstore": "$image_id[blobstore]",
+  "https://$docker_registry/$docker_user/router": "$image_id[router]",
+  "https://$docker_registry/$docker_user/receiver": "$image_id[receiver]",
+  "https://$docker_registry/$docker_user/slugbuilder": "$image_id[slugbuilder]",
+  "https://$docker_registry/$docker_user/slugrunner": "$image_id[slugrunner]",
+  "https://$docker_registry/$docker_user/bootstrap": "$image_id[bootstrap]",
+  "https://$docker_registry/$docker_user/taffy": "$image_id[taffy]"
 }

@@ -47,14 +47,15 @@ OPTIONS:
   -k            Keep release directory
   -b BUCKET     The S3 bucket to sync the apt repo with [default: flynn]
   -r DIR        Resume the release using DIR
+  -u USER       The Docker user [default: flynn]
 USAGE
 }
 
 main() {
-  local bucket dir
+  local bucket dir docker_user
   local keep=false
 
-  while getopts "hkb:r:" opt; do
+  while getopts "hkb:r:u:" opt; do
     case $opt in
       h)
 	usage
@@ -72,6 +73,9 @@ main() {
           fail "No such directory: ${dir}"
         fi
         ;;
+      u)
+        docker_user=$OPTARG
+	;;
       ?)
 	usage
 	exit 1
@@ -95,6 +99,7 @@ main() {
 
   bucket="${bucket:-"flynn"}"
   dir="${dir:-$(mktemp -d)}"
+  docker_user=${docker_user:-"flynn"}
   info "using base dir: ${dir}"
 
   export GOPATH="${dir}"
@@ -113,6 +118,7 @@ main() {
 
   info "building flynn"
   git checkout --force --quiet $commit
+  sed "s/CONFIG_DOCKER_USER=.*/CONFIG_DOCKER_USER=${docker_user}/" -i tup.config
   tup
 
   popd >/dev/null

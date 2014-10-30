@@ -45,18 +45,28 @@ func manifest(args *docopt.Args) {
 		log.Fatal(err)
 	}
 
-	if err := interpolateManifest(lookup, src, dest); err != nil {
+	if err := interpolateManifest(
+		lookup,
+		args.String["--docker-user"],
+		args.String["--docker-registry"],
+		src,
+		dest,
+	); err != nil {
 		log.Fatal(err)
 	}
 }
 
 var imageIDPattern = regexp.MustCompile(`\$image_id\[[^\]]+\]`)
+var dockerUserPattern = regexp.MustCompile(`\$docker_user`)
+var dockerRegistryPattern = regexp.MustCompile(`\$docker_registry`)
 
-func interpolateManifest(lookup idLookupFunc, src io.Reader, dest io.Writer) error {
+func interpolateManifest(lookup idLookupFunc, dockerUser, dockerRegistry string, src io.Reader, dest io.Writer) error {
 	manifest, err := ioutil.ReadAll(src)
 	if err != nil {
 		return err
 	}
+	manifest = dockerUserPattern.ReplaceAll(manifest, []byte(dockerUser))
+	manifest = dockerRegistryPattern.ReplaceAll(manifest, []byte(dockerRegistry))
 	var replaceErr interface{}
 	func() {
 		defer func() {
@@ -65,7 +75,7 @@ func interpolateManifest(lookup idLookupFunc, src io.Reader, dest io.Writer) err
 		manifest = imageIDPattern.ReplaceAllFunc(manifest, func(raw []byte) []byte {
 			imageName := string(raw[10 : len(raw)-1])
 			if !strings.Contains(imageName, "/") {
-				imageName = "flynn/" + imageName
+				imageName = dockerUser + "/" + imageName
 			}
 			res, err := lookup(imageName)
 			if err != nil {

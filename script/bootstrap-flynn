@@ -14,14 +14,15 @@ OPTIONS:
   -b BACKEND    The job backend to use (either docker or libvirt-lxc) [default: libvirt-lxc]
   -d DOMAIN     The default domain to use [default: dev.localflynn.com]
   -i IP         The external IP address to bind to [default: the IP assigned to eth0]
+  -u USER       The Docker user [default: flynn]
 USAGE
 }
 
 main() {
-  local backend ip
+  local backend ip docker_user
   local domain="${CONTROLLER_DOMAIN}"
 
-  while getopts "hb:d:i:" opt; do
+  while getopts "hb:d:i:u:" opt; do
     case $opt in
       h)
         usage
@@ -36,6 +37,9 @@ main() {
       i)
         ip=$OPTARG
         ;;
+      u)
+        docker_user=$OPTARG
+	;;
       ?)
         usage
         exit 1
@@ -46,6 +50,7 @@ main() {
   backend=${backend:-"libvirt-lxc"}
   domain="${domain:="dev.localflynn.com"}"
   ip=${ip:-$(/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')}
+  docker_user=${docker_user:-"flynn"}
 
   export DISCOVERD="${ip}:1111"
   export CONTROLLER_DOMAIN="${domain}"
@@ -59,7 +64,7 @@ main() {
       boot_libvirt_lxc $ip
       ;;
     docker)
-      boot_docker $ip
+      boot_docker $ip $docker_user
       ;;
     *)
       usage
@@ -98,13 +103,14 @@ boot_libvirt_lxc() {
 
 boot_docker() {
   local ip=$1
+  local docker_user=$2
 
   info "starting flynn-host (docker backend)"
   docker run \
     --detach \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --publish 1113:1113 \
-    flynn/host \
+    "${docker_user}/host" \
     --external $ip \
     --force \
     --backend docker
@@ -114,7 +120,7 @@ boot_docker() {
     --env DISCOVERD="${DISCOVERD}" \
     --env CONTROLLER_DOMAIN="${CONTROLLER_DOMAIN}" \
     --env DEFAULT_ROUTE_DOMAIN="${DEFAULT_ROUTE_DOMAIN}" \
-    flynn/bootstrap
+    "${docker_user}/bootstrap"
 }
 
 main $@

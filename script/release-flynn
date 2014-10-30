@@ -15,15 +15,16 @@ OPTIONS:
   -b BUCKET     The S3 bucket to upload packages and vm images to [default: flynn]
   -d DOMAIN     The CloudFront domain [default: dl.flynn.io]
   -r DIR        Resume the release using DIR
+  -u USER       The Docker user [default: flynn]
 
 Requires AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to be set
 USAGE
 }
 
 main() {
-  local bucket dir domain
+  local bucket dir domain docker_user
 
-  while getopts "hb:d:r:" opt; do
+  while getopts "hb:d:r:u:" opt; do
     case $opt in
       h)
         usage
@@ -41,6 +42,9 @@ main() {
           fail "No such directory: ${dir}"
         fi
         ;;
+      u)
+        docker_user=$OPTARG
+	;;
       ?)
         usage
         exit 1
@@ -60,6 +64,7 @@ main() {
   bucket="${bucket:-"flynn"}"
   dir="${dir:-$(mktemp -d)}"
   domain="${domain:-"dl.flynn.io"}"
+  docker_user=${docker_user:-"flynn"}
 
   # release-packages prints results to fd 3, so create a pipe to read them
   results="$(mktemp -u)"
@@ -71,6 +76,7 @@ main() {
     -k \
     -b "${bucket}" \
     -r "${dir}" \
+    -u "${docker_user}" \
     "${commit}" \
     3>"${results}" \
     &
